@@ -7,7 +7,7 @@ def index():
     return '''<!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8">y
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chatbot de Profissionais</title>
   <style>
@@ -34,7 +34,7 @@ def index():
       <span>Encontre eletricistas, diaristas e muito mais!</span>
     </div>
     <div class="chat-messages" id="messages">
-      <div class="msg bot">Olá! Eu sou seu assistente de profissionais. 👋\nDigite o serviço que você precisa, como <b>eletricista</b> ou <b>diarista</b>.</div>
+      <div class="msg bot">Olá, Meu nome é Tobias, sou  o assistente de IA do projeto comuniq, pronto para te ajudar.  👋\n\nDigite o serviço que você precisa, como <b>eletricista</b> ou <b>diarista</b>.</div>
     </div>
     <div class="chat-input">
       <input type="text" id="msgInput" placeholder="Digite sua mensagem..." onkeydown="if(event.key==='Enter') enviar()">
@@ -83,6 +83,7 @@ estado = "esperando_pesquisa"
 ultimos_resultados = []
 profissional_top = None
 
+
 # ===== ROTA DO CHAT =====
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -118,7 +119,7 @@ def chat():
             nomes = ", ".join([f'{p["nome"]} ({p["avaliacao"]}⭐)' for p in resultados])
 
             return jsonify({
-                "resposta": f"Encontrei: {nomes}. Deseja ver o mais bem avaliado?"
+                "resposta": f"Encontrei O {nomes}. Deseja ver o  Profisisonal mais bem avaliado? (sim/não)" 
             })
 
         else:
@@ -136,7 +137,7 @@ def chat():
                 "resposta": f"O melhor é {profissional_top['nome']} ({profissional_top['avaliacao']}⭐).\n1 - Contratar\n2 - Buscar outro"
             })
 
-        elif msg in ["nao", "não"]:
+        elif msg in ["nao", "não", "Nao", "Não"]:
             estado = "esperando_pesquisa"
             return jsonify({"resposta": "Ok! Pode buscar outro serviço."})
 
@@ -147,19 +148,55 @@ def chat():
 
         if msg == "1":
             nome = profissional_top["nome"]
-            estado = "esperando_pesquisa"
+            estado = "esperando_feedback"
 
             return jsonify({
-                "resposta": f"Solicitação enviada para {nome}!"
+                "resposta": f"Solicitação enviada para {nome}! \n\n Obrigado por utilizar o Tobias. Sua pedido foi encaminhado com sucesso."
+                "\n\n Antes de encerrar, Como Você avalia seu atendimento? " 
+                "\n 1- Excelente"
+                "\n 2- Bom"
+                "\n 3- Regular"
+                "\n 4- Ruim"
             })
-
+    
         elif msg == "2":
-            estado = "esperando_pesquisa"
-            return jsonify({"resposta": "Busque outro serviço."})
+                estado = "esperando_pesquisa"
+                return jsonify({"resposta": "Busque outro serviço."})
 
         else:
-            return jsonify({"resposta": "Digite 1 ou 2."})
+                return jsonify({"resposta": "Digite 1 ou 2."})
+        
+    elif estado == "esperando_feedback":
 
+
+          if msg == "1":
+            estado = "esperando_pesquisa"
+            return jsonify({
+            "resposta": "Ficamos muito felizes com sua avaliação! 😊 Obrigado por usar o Tobias 🐶🤖"
+          })
+
+          elif msg == "2":
+            estado = "esperando_pesquisa"
+            return jsonify({
+            "resposta": "Obrigado pelo seu feedback! Vamos continuar melhorando 😊"
+          })
+
+          elif msg == "3":
+            estado = "esperando_pesquisa"
+            return jsonify({
+            "resposta": "Agradecemos sua sinceridade. Vamos buscar melhorar sua experiência."
+          })
+
+          elif msg == "4":
+            estado = "esperando_pesquisa"
+            return jsonify({
+            "resposta": "Sentimos muito que sua experiência não tenha sido ideal. Seu feedback é importante para evoluirmos."
+          })
+
+          else:
+              return jsonify({
+              " resposta": "Por favor, escolha uma opção de 1 a 4 para avaliar o atendimento."
+              })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=False)
